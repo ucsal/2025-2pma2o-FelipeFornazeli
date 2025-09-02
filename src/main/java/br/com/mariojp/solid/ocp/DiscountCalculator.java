@@ -1,11 +1,21 @@
 package br.com.mariojp.solid.ocp;
 
+import java.util.List;
+import java.util.logging.Filter;
+
 public class DiscountCalculator {
-    public double apply(double amount, CustomerType type){
-        switch (type){
-            case REGULAR: return amount * 0.95;
-            case PREMIUM: return amount * 0.90;
-            default: return amount;
-        }
+    private final List<DiscountPolicy> policies;
+
+    public DiscountCalculator(List<DiscountPolicy> policies){
+        this.policies = policies;
+
     }
+    public double apply(double amount, CustomerType type){
+        return policies.stream()
+        .filter(policy -> policy.appliesTo(type))
+        .findFirst()
+        .map(policy -> policy.apply(amount))
+        .orElse(amount);
+    }
+
 }
